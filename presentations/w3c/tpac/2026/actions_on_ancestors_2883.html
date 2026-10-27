@@ -229,11 +229,7 @@ myView.accessibilityCustomActions = [
       </div>
     </div>
     <aside class="notes" aria-label="Speaker notes">
-      <p>Sources:
-      <a href="https://developer.apple.com/documentation/objectivec/nsobject-swift.class/accessibilitycustomactions">Apple Developer Documentation</a> ·
-      <a href="https://developer.apple.com/documentation/accessibility/delivering_an_exceptional_accessibility_experience">Sample code</a> ·
-      <a href="https://developer.apple.com/documentation/swiftui/view/accessibilityaction(named:_:)">SwiftUI <code>accessibilityAction(named:)</code></a></p>
-      <p>On the web, <code>aria-actions</code> references elements, and triggering an action fires a synthesized click event on the referenced element, so pages can't easily detect assistive technology use (<a href="https://www.w3.org/TR/design-principles/#do-not-expose-use-of-assistive-tech">Design Principle 2.11</a>). That constraint on how actions are delivered in the web shouldn't restrict authors from declaring actions on a container on behalf of its contents.</p>
+      <p>The native examples here directly call a method on the view model. On the web however, <code>aria-actions</code> references elements, and triggering an action fires a synthesized click event on the referenced element, so pages can't easily detect assistive technology (<a href="https://www.w3.org/TR/design-principles/#do-not-expose-use-of-assistive-tech">Design Principle 2.11</a>). That constraint on how actions are delivered in the web shouldn't restrict authors from declaring actions on a container on behalf of its contents.</p>
     </aside>
   </section>
 

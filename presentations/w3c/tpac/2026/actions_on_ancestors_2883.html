@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aria-actions on ancestors — w3c/aria#2883 — TPAC 2026</title>
+<style>
+  :root {
+    --bg: #fff;
+    --fg: #1b1b1b;
+    --muted: #555;
+    --accent: #0b5cad;
+    --accent-bg: #e8f1fb;
+    --bad: #a4161a;
+    --good: #1e6b30;
+    --code-bg: #f3f3f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141414;
+      --fg: #f2f2f2;
+      --muted: #b5b5b5;
+      --accent: #7cb8ff;
+      --accent-bg: #1c2a3a;
+      --bad: #ff8a8a;
+      --good: #7fd88f;
+      --code-bg: #232323;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 400 clamp(16px, 2.3vmin + 0.5vw, 34px)/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  main { height: 100%; }
+  .slide {
+    height: 100%;
+    padding: 6vmin 8vmin 12vmin;
+    display: flex;
+    flex-direction: column;
+    /* "safe" keeps the top reachable when a slide (e.g. with notes shown) is taller than the window. */
+    justify-content: safe center;
+    overflow-y: auto;
+    gap: 0.6em;
+  }
+  .slide[hidden] { display: none; }
+  /* Don't squash code blocks when notes are shown; let the slide grow instead. */
+  .slide > * { flex-shrink: 0; }
+  h1, h2 { margin: 0 0 0.3em; line-height: 1.15; }
+  h1 { font-size: 2.2em; }
+  h2 { font-size: 1.7em; }
+  h2:focus { outline: none; }
+  /* A second heading within a slide starts a new section. */
+  .slide ol + h2 { margin-top: 0.6em; }
+  p, ul, ol { margin: 0; }
+  li + li { margin-top: 0.3em; }
+  .subtitle { color: var(--muted); font-size: 1.1em; }
+  .meta { color: var(--muted); }
+  .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2em; align-items: start; }
+  .code-pair pre { font-size: 0.62em; }
+  @media (max-aspect-ratio: 1/1) { .cols { grid-template-columns: 1fr; } }
+
+  pre {
+    margin: 0;
+    padding: 0.6em 0.8em;
+    background: var(--code-bg);
+    border-radius: 8px;
+    font-size: 0.72em;
+    line-height: 1.45;
+    overflow-x: auto;
+  }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  mark { background: var(--accent-bg); color: inherit; font-weight: 600; padding: 0 0.1em; }
+
+  .bad { color: var(--bad); font-weight: 600; }
+  .good { color: var(--good); font-weight: 600; }
+
+  .options { list-style: none; padding: 0; display: grid; gap: 0.35em; }
+  .options li { margin: 0; padding: 0.25em 0.5em; border-left: 6px solid transparent; display: grid; grid-template-columns: 1.6em 1fr; }
+  .options .pick { border-left-color: var(--accent); background: var(--accent-bg); font-weight: 600; }
+  .options .num { font-weight: 700; }
+  .options .detail { display: block; font-size: 0.75em; }
+
+  .big-link { font-size: 1.2em; font-weight: 600; }
+
+  .notes {
+    margin-top: 0.8em;
+    padding: 0.6em 0.8em;
+    border: 2px dashed var(--muted);
+    border-radius: 8px;
+    font-size: 0.7em;
+    color: var(--muted);
+  }
+  body:not(.show-notes) .notes { display: none; }
+
+  nav.controls {
+    position: fixed;
+    inset: auto 0 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4em;
+    padding: 0.5em 1em;
+    font-size: 0.6em;
+    color: var(--muted);
+  }
+  nav.controls button {
+    font: inherit;
+    color: var(--fg);
+    background: var(--code-bg);
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    padding: 0.25em 0.7em;
+    cursor: pointer;
+  }
+  nav.controls button:disabled { opacity: 0.4; cursor: default; }
+  #counter { min-width: 4.5em; text-align: center; }
+
+  @media (forced-colors: active) {
+    .options .pick { border-left-color: Highlight; }
+    mark { background: Mark; color: MarkText; }
+  }
+  @media print {
+    nav.controls { display: none; }
+    .slide, .slide[hidden] {
+      display: flex;
+      height: auto;
+      min-height: 100vh;
+      break-after: page;
+    }
+  }
+</style>
+</head>
+<body>
+
+<main id="deck" aria-label="Presentation">
+
+  <section class="slide" aria-labelledby="s1-title">
+    <h1 id="s1-title" tabindex="-1"><code>aria-actions</code> on ancestors</h1>
+    <p class="subtitle">What authors expect and how it could work</p>
+    <p class="meta">
+      <a href="https://github.com/w3c/aria/issues/2883">w3c/aria#2883</a> ·
+      ARIA WG, TPAC 2026, Dublin · James Craig (@cookiecrook)
+    </p>
+  </section>
+
+  <section class="slide" aria-labelledby="s2-title" hidden>
+    <h2 id="s2-title" tabindex="-1">The problem</h2>
+    <div class="cols">
+      <div>
+        <p><span class="good">Works:</span> on the link</p>
+<pre aria-label="Code example: actions on the link"><code>&lt;li&gt;
+  &lt;a href="…"
+    <mark>aria-actions="fave-1 del-1"</mark>&gt;ARIA&lt;/a&gt;
+  &lt;button id="fave-1"&gt;Favorite&lt;/button&gt;
+  &lt;button id="del-1"&gt;Delete&lt;/button&gt;
+&lt;/li&gt;</code></pre>
+      </div>
+      <div>
+        <p><span class="bad">Doesn't work:</span> on the row</p>
+<pre aria-label="Code example: actions on the table row"><code>&lt;tr <mark>aria-actions="fave-1 del-1"</mark>&gt;
+  &lt;th&gt;&lt;a href="…"&gt;ARIA&lt;/a&gt;&lt;/th&gt;
+  &lt;td&gt;1.2&lt;/td&gt; …
+  &lt;td&gt;
+    &lt;button id="fave-1"&gt;Favorite&lt;/button&gt;
+    &lt;button id="del-1"&gt;Delete&lt;/button&gt;
+  &lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+      </div>
+    </div>
+    <!--
+    <ul>
+      <li>Focus or the reading cursor lands on the <strong>link</strong> or other <strong>cell contents</strong>, not the row.</li>
+      <li>Those elements have no <code>aria-actions</code> of their own, so <span class="bad">the actions are never surfaced</span>.</li>
+      <li>The spec text (<a href="https://github.com/w3c/aria/pull/1805">PR #1805</a>) doesn't say whether AT should look at ancestors.</li>
+      <li>AI-generated test cases assumed inheritance <em>every time</em>. Human authors will too.</li>
+    </ul>
+    -->
+    <aside class="notes" aria-label="Speaker notes">
+      <p>Simplified from the <a href="https://cookiecrook.github.io/examples/actions_on_ancestors_2883.html">test case</a>.</p>
+    </aside>
+  </section>
+
+  <section class="slide" aria-labelledby="s3-title" hidden>
+    <h2 id="s3-title" tabindex="-1">Native example</h2>
+<div class="cols code-pair">
+      <div>
+        <p><strong>UIKit</strong></p>
+<pre aria-label="UIKit code example"><code>myView.isAccessibilityElement = true
+
+myView.accessibilityCustomActions = [
+  UIAccessibilityCustomAction(name: "Favorite",
+    <mark>target: self,</mark>
+    <mark>selector: #selector(favoriteItem)</mark>),
+  UIAccessibilityCustomAction(name: "Delete",
+    <mark>target: self,</mark>
+    <mark>selector: #selector(deleteItem)</mark>)
+]</code></pre>
+      </div>
+      <div>
+        <p><strong>SwiftUI</strong></p>
+<pre aria-label="SwiftUI code example"><code>HStack {
+  // item content
+}
+.accessibilityElement()
+.accessibilityAction(named: Text("Favorite")) {
+  <mark>viewModel.favoriteItem()</mark>
+}
+.accessibilityAction(named: Text("Delete")) {
+  <mark>viewModel.deleteItem()</mark>
+}</code></pre>
+      </div>
+    </div>
+    <aside class="notes" aria-label="Speaker notes">
+      <p>Sources:
+      <a href="https://developer.apple.com/documentation/objectivec/nsobject-swift.class/accessibilitycustomactions">Apple Developer Documentation</a> ·
+      <a href="https://developer.apple.com/documentation/accessibility/delivering_an_exceptional_accessibility_experience">Sample code</a> ·
+      <a href="https://developer.apple.com/documentation/swiftui/view/accessibilityaction(named:_:)">SwiftUI <code>accessibilityAction(named:)</code></a></p>
+      <p>On the web, <code>aria-actions</code> references elements, and triggering an action fires a synthesized click event on the referenced element, so pages can't easily detect assistive technology use (<a href="https://www.w3.org/TR/design-principles/#do-not-expose-use-of-assistive-tech">Design Principle 2.11</a>). That constraint on how actions are delivered in the web shouldn't restrict authors from declaring actions on a container on behalf of its contents.</p>
+    </aside>
+  </section>
+
+  <section class="slide" aria-labelledby="s4-title" hidden>
+    <h2 id="s4-title" tabindex="-1">Demo: <a href="https://cookiecrook.github.io/examples/actions_on_ancestors_2883.html"><code>aria-actions</code> test case</a></h2>
+  </section>
+
+  <section class="slide" aria-labelledby="s5-title" hidden>
+    <h2 id="s5-title" tabindex="-1">Options</h2>
+    <ol class="options">
+      <li><span class="num">1.</span><span class="text">No change in <a href="https://github.com/w3c/aria/pull/1805">PR #1805</a></span></li>
+      <li><span class="num">2.</span><span class="text">Actions <em>either</em> from the element, <em>or</em> the first ancestor with actions</span></li>
+      <li><span class="num">3.</span><span class="text">Inherit and concatenate actions from current element and <em>all</em> ancestors</span></li>
+      <li><span class="num">4.</span><span class="text">2 or 3, plus an explicit override <span class="detail">(<code>aria-actions=""</code> is currently a placeholder/promise, not an override)</span></span></li>
+      <li><span class="num">5.</span><span class="text">Something else?</span></li>
+    </ol>
+    <aside class="notes" aria-label="Speaker notes">
+      <p>Also considered: a redirect, e.g. <code>aria-actionsfrom</code>.</p>
+    </aside>
+  </section>
+
+  <section class="slide" aria-labelledby="s7-title" hidden>
+    <h2 id="s7-title" tabindex="-1">Discussion</h2>
+    <ul>
+      <li>If concatenated, determine order and confirm de-duplication</li>
+      <li>Should this land in <a href="https://github.com/w3c/aria/pull/1805">PR #1805</a> or a follow-up?</li>
+    </ul>
+    <aside class="notes" aria-label="Speaker notes">
+      <p>Background: <a href="https://gist.github.com/smhigley/8dbe67f834cc472e3a14bf6b289e6f0c?permalink_comment_id=4110615#gistcomment-4110615">2022 container-actions comment</a></p>
+    </aside>
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Slide controls">
+  <button type="button" id="prev" aria-keyshortcuts="ArrowLeft">Previous</button>
+  <span id="counter" aria-hidden="true"></span>
+  <button type="button" id="next" aria-keyshortcuts="ArrowRight">Next</button>
+  <button type="button" id="notes-toggle" aria-pressed="false" aria-keyshortcuts="N">Notes</button>
+  <button type="button" id="fullscreen" aria-pressed="false" aria-keyshortcuts="F">Full screen</button>
+</nav>
+
+<div id="status" class="visually-hidden" role="status" aria-live="polite"></div>
+<p class="visually-hidden">Keyboard: arrow keys or Page Up and Page Down change slides, Home and End jump to the first or last slide, F toggles full screen, N toggles speaker notes.</p>
+
+<script>
+(() => {
+  const slides = [...document.querySelectorAll('.slide')];
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const counter = document.getElementById('counter');
+  const status = document.getElementById('status');
+  const notesToggle = document.getElementById('notes-toggle');
+  const fsButton = document.getElementById('fullscreen');
+  const baseTitle = document.title;
+  let current = -1;
+
+  function headingOf(slide) {
+    return slide.querySelector('h1, h2');
+  }
+
+  function indexFromHash() {
+    const n = parseInt(location.hash.slice(1), 10);
+    return Number.isInteger(n) && n >= 1 && n <= slides.length ? n - 1 : 0;
+  }
+
+  function show(index, { announce = true, moveFocus = false } = {}) {
+    index = Math.max(0, Math.min(slides.length - 1, index));
+    if (index === current) return;
+    current = index;
+    slides.forEach((s, i) => { s.hidden = i !== index; });
+    const heading = headingOf(slides[index]);
+    const label = `Slide ${index + 1} of ${slides.length}`;
+    counter.textContent = `${index + 1} / ${slides.length}`;
+    prev.disabled = index === 0;
+    next.disabled = index === slides.length - 1;
+    document.title = `${heading.textContent} (${index + 1}/${slides.length}) — ${baseTitle}`;
+    if (location.hash !== `#${index + 1}`) history.replaceState(null, '', `#${index + 1}`);
+    if (moveFocus) heading.focus();
+    else if (announce) status.textContent = `${label}: ${heading.textContent}`;
+  }
+
+  // Disabled buttons lose focus; keep keyboard users on the control bar.
+  function go(delta, fromButton) {
+    show(current + delta);
+    if (fromButton && fromButton.disabled) (fromButton === prev ? next : prev).focus();
+  }
+
+  prev.addEventListener('click', () => go(-1, prev));
+  next.addEventListener('click', () => go(1, next));
+
+  notesToggle.addEventListener('click', () => {
+    const on = document.body.classList.toggle('show-notes');
+    notesToggle.setAttribute('aria-pressed', String(on));
+  });
+
+  function toggleFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen().catch(() => {});
+  }
+  fsButton.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', () => {
+    const on = Boolean(document.fullscreenElement);
+    fsButton.setAttribute('aria-pressed', String(on));
+  });
+  if (!document.fullscreenEnabled) fsButton.hidden = true;
+
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.defaultPrevented) return;
+    const t = e.target;
+    const interactive = t.closest && t.closest('a, button, input, textarea, select, [contenteditable]');
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case 'PageDown':
+        show(current + 1); break;
+      case ' ':
+        if (interactive) return;
+        show(current + (e.shiftKey ? -1 : 1)); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        show(current - 1); break;
+      case 'Home': show(0); break;
+      case 'End': show(slides.length - 1); break;
+      case 'f': case 'F': toggleFullscreen(); break;
+      case 'n': case 'N': notesToggle.click(); break;
+      default: return;
+    }
+    e.preventDefault();
+  });
+
+  window.addEventListener('hashchange', () => show(indexFromHash(), { moveFocus: true }));
+  show(indexFromHash(), { announce: false });
+})();
+</script>
+</body>
+</html>

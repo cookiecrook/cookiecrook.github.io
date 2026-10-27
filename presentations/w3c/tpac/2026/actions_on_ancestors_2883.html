@@ -204,12 +204,14 @@
 <pre aria-label="UIKit code example"><code>myView.isAccessibilityElement = true
 
 myView.accessibilityCustomActions = [
-  UIAccessibilityCustomAction(name: "Favorite",
-    <mark>target: self,</mark>
-    <mark>selector: #selector(favoriteItem)</mark>),
-  UIAccessibilityCustomAction(name: "Delete",
-    <mark>target: self,</mark>
-    <mark>selector: #selector(deleteItem)</mark>)
+  UIAccessibilityCustomAction(name: "Favorite") { _ in
+    <mark>viewModel.favoriteItem()</mark>
+    return true
+  },
+  UIAccessibilityCustomAction(name: "Delete") { _ in
+    <mark>viewModel.deleteItem()</mark>
+    return true
+  }
 ]</code></pre>
       </div>
       <div>

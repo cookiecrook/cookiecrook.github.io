@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>aria-actions test cases for w3c/aria#2883</title>
+<style>
+  body {
+    font: 18px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    max-width: 44em;
+    margin: 2em auto;
+    padding: 0 1em;
+    color: #1b1b1b;
+    background: #fff;
+  }
+  section + section { margin-top: 2.5em; }
+  .bookmarks { list-style: none; padding: 0; }
+  .bookmarks li {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.3em 0.4em;
+    border-bottom: 1px solid #ddd;
+  }
+  .bookmarks li:first-child { border-top: 1px solid #ddd; }
+  .bookmarks .name { flex: 1; }
+  .bookmarks a:focus-visible {
+    outline: 3px solid #0b5cad;
+    outline-offset: 2px;
+  }
+  .bookmarks button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2em;
+    height: 2em;
+    padding: 0;
+    font: inherit;
+    color: #555;
+    background: none;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  .bookmarks button:hover { background: #f0f0f0; }
+  .bookmarks svg { width: 1.25em; height: 1.25em; }
+  .fave { font-size: 1.3em; line-height: 1; }
+  /* Style the <svg>, not its paths: selectors don't reach into <use> content, but inherited properties do. */
+  .bookmarks button[aria-pressed="true"] { color: #000; border-color: #000; }
+  .trash { fill: currentColor; }
+  table.bookmarks { border-collapse: collapse; width: 100%; }
+  table.bookmarks caption { text-align: left; font-weight: 600; padding-bottom: 0.3em; }
+  table.bookmarks th, table.bookmarks td { text-align: left; padding: 0.3em 0.5em; border-bottom: 1px solid #ddd; }
+  table.bookmarks tbody th { font-weight: normal; }
+  table.bookmarks .actions { white-space: nowrap; }
+  kbd {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    border: 1px solid #888;
+    border-radius: 4px;
+    padding: 0 0.3em;
+  }
+  /* The hidden attribute doesn't hide an <svg>, so collapse the icon definitions instead. */
+  .icon-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  @media (forced-colors: active) {
+    .bookmarks button, .bookmarks button[aria-pressed="true"] { color: ButtonText; border-color: ButtonText; }
+    .bookmarks button[aria-pressed="true"] { outline: 2px solid Highlight; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Icons, referenced by <use> in each button. -->
+<svg class="icon-defs" aria-hidden="true" focusable="false">
+  <symbol id="icon-trash" viewBox="0 0 24 24">
+    <path d="M9 2.5h6l1 1.5h4.5v2h-17v-2H8zM5.5 7.5h13l-1 13.5h-11zm4 2.5v8.5H11V10zm3.5 0v8.5h1.5V10z"/>
+  </symbol>
+</svg>
+
+<h1><code>aria-actions</code> test cases for <a href="https://github.com/w3c/aria/issues/2883">w3c/aria#2883</a></h1>
+
+<section aria-labelledby="ex1-title">
+  <h2 id="ex1-title">Example 1: actions on the focusable link (not on an ancestor)</h2>
+  <p><code>aria-actions</code> is on each link, so the actions (Favorite and Delete) work when focus is on the link. The buttons are exposed to assistive technology but aren't in the tab order.</p>
+
+  <ul class="bookmarks" role="none">
+    <li>
+      <a class="name" id="ex1-link-1" href="https://w3c.github.io/aria/" aria-actions="ex1-fave-1 ex1-del-1" aria-labelledby="ex1-link-1">ARIA</a>
+      <button type="button" class="fave" id="ex1-fave-1" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+      <button type="button" id="ex1-del-1" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+    </li>
+    <li>
+      <a class="name" id="ex1-link-2" href="https://w3c.github.io/accname/" aria-actions="ex1-fave-2 ex1-del-2" aria-labelledby="ex1-link-2">AccName</a>
+      <button type="button" class="fave" id="ex1-fave-2" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+      <button type="button" id="ex1-del-2" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+    </li>
+    <li>
+      <a class="name" id="ex1-link-3" href="https://w3c.github.io/html-aam/" aria-actions="ex1-fave-3 ex1-del-3" aria-labelledby="ex1-link-3">HTML-AAM</a>
+      <button type="button" class="fave" id="ex1-fave-3" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+      <button type="button" id="ex1-del-3" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+    </li>
+    <li>
+      <a class="name" id="ex1-link-4" href="https://w3c.github.io/svg-aam/" aria-actions="ex1-fave-4 ex1-del-4" aria-labelledby="ex1-link-4">SVG-AAM</a>
+      <button type="button" class="fave" id="ex1-fave-4" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+      <button type="button" id="ex1-del-4" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+    </li>
+  </ul>
+
+  <h3>Keyboard shortcuts (when a link has focus)</h3>
+  <ul>
+    <li><kbd>F</kbd>: Favorite or unfavorite</li>
+    <li><kbd>Delete</kbd> (or <kbd>Backspace</kbd>): Delete</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ex2-title">
+  <h2 id="ex2-title">Example 2: actions on an ancestor (table row) of the link</h2>
+  <p><code>aria-actions</code> is assigned on the ancestor <code>&lt;tr&gt;</code>, not on the link. Because focus and the reading cursor land on elements inside the row, like the link, the actions don't work there due to the gap in the spec. The buttons are exposed to assistive technology but aren't in the tab order.</p>
+
+  <table class="bookmarks">
+    <caption>Specifications</caption>
+    <thead>
+      <tr>
+        <th scope="col">Specification</th>
+        <th scope="col">Version</th>
+        <th scope="col">Latest TR publication</th>
+        <th scope="col">Status</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr aria-actions="ex2-fave-1 ex2-del-1">
+        <th scope="row"><a class="name" id="ex2-link-1" href="https://www.w3.org/TR/wai-aria-1.2/" aria-labelledby="ex2-link-1">ARIA</a></th>
+        <td>1.2</td>
+        <td><time datetime="2023-06-06">6 June 2023</time></td>
+        <td>Recommendation</td>
+        <td class="actions">
+          <button type="button" class="fave" id="ex2-fave-1" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+          <button type="button" id="ex2-del-1" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+        </td>
+      </tr>
+      <tr aria-actions="ex2-fave-2 ex2-del-2">
+        <th scope="row"><a class="name" id="ex2-link-2" href="https://www.w3.org/TR/accname-1.2/" aria-labelledby="ex2-link-2">AccName</a></th>
+        <td>1.2</td>
+        <td><time datetime="2026-10-21">21 October 2026</time></td>
+        <td>Working Draft</td>
+        <td class="actions">
+          <button type="button" class="fave" id="ex2-fave-2" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+          <button type="button" id="ex2-del-2" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+        </td>
+      </tr>
+      <tr aria-actions="ex2-fave-3 ex2-del-3">
+        <th scope="row"><a class="name" id="ex2-link-3" href="https://www.w3.org/TR/html-aam-1.0/" aria-labelledby="ex2-link-3">HTML-AAM</a></th>
+        <td>1.0</td>
+        <td><time datetime="2026-10-26">26 October 2026</time></td>
+        <td>Working Draft</td>
+        <td class="actions">
+          <button type="button" class="fave" id="ex2-fave-3" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+          <button type="button" id="ex2-del-3" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+        </td>
+      </tr>
+      <tr aria-actions="ex2-fave-4 ex2-del-4">
+        <th scope="row"><a class="name" id="ex2-link-4" href="https://www.w3.org/TR/svg-aam-1.0/" aria-labelledby="ex2-link-4">SVG-AAM</a></th>
+        <td>1.0</td>
+        <td><time datetime="2026-10-21">21 October 2026</time></td>
+        <td>Working Draft</td>
+        <td class="actions">
+          <button type="button" class="fave" id="ex2-fave-4" tabindex="-1" aria-pressed="false" aria-label="Favorite">☆</button>
+          <button type="button" id="ex2-del-4" tabindex="-1"><svg class="trash" aria-hidden="true"><use href="#icon-trash"/></svg><span class="visually-hidden">Delete</span></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Keyboard shortcuts (when focus is on or in a row)</h3>
+  <ul>
+    <li><kbd>F</kbd>: Favorite or unfavorite</li>
+    <li><kbd>Delete</kbd> (or <kbd>Backspace</kbd>): Delete</li>
+  </ul>
+  <p>These shortcuts are page script, so they work anywhere in the row. What's missing on the link and other cell contents is the assistive technology actions from <code>aria-actions</code>.</p>
+</section>
+
+<div id="status" class="visually-hidden" role="status"></div>
+
+<script>
+(() => {
+  const status = document.getElementById('status');
+
+  // Only keyboard shortcuts announce changes. Clicks (including actions run by assistive technology) don't,
+  // so the screen reader's own feedback for an action isn't mixed with page announcements.
+  // Clear first so a repeated message is still announced.
+  function announce(message) {
+    status.textContent = '';
+    setTimeout(() => { status.textContent = message; }, 100);
+  }
+
+  // The action elements referenced by an element's aria-actions attribute.
+  function actionsFor(element) {
+    return (element.getAttribute('aria-actions') || '')
+      .split(/\s+/)
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+  }
+
+  function nameFor(button) {
+    return button.closest('li, tr').querySelector('.name').textContent;
+  }
+
+  // When favorited, the link is labelled by itself and the Favorite button.
+  function toggleFavorite(button, { fromShortcut = false } = {}) {
+    const pressed = button.getAttribute('aria-pressed') !== 'true';
+    button.setAttribute('aria-pressed', String(pressed));
+    button.textContent = pressed ? '★' : '☆';
+    const link = button.closest('li, tr').querySelector('a');
+    link.setAttribute('aria-labelledby', pressed ? `${link.id} ${button.id}` : link.id);
+    if (fromShortcut) announce(`${nameFor(button)} ${pressed ? 'added to' : 'removed from'} favorites`);
+  }
+
+  function deleteItem(button, { fromShortcut = false } = {}) {
+    const item = button.closest('li, tr');
+    const list = item.parentElement;
+    const name = nameFor(button);
+    const hadFocus = item.contains(document.activeElement);
+    const neighbor = item.nextElementSibling || item.previousElementSibling;
+    item.remove();
+    if (hadFocus && neighbor) neighbor.querySelector('a').focus();
+    if (fromShortcut) announce(list.children.length ? `${name} deleted` : `${name} deleted. No items left.`);
+  }
+
+  document.querySelectorAll('.bookmarks button[aria-pressed]').forEach((button) => {
+    button.addEventListener('click', () => toggleFavorite(button));
+  });
+  document.querySelectorAll('.bookmarks button:not([aria-pressed])').forEach((button) => {
+    button.addEventListener('click', () => deleteItem(button));
+  });
+
+  document.querySelectorAll('.bookmarks').forEach((list) => {
+    list.addEventListener('keydown', (e) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      // Use the nearest aria-actions at or above focus: the link in example 1, the row in example 2.
+      const owner = e.target.closest('[aria-actions]');
+      if (!owner) return;
+      const [fave, del] = actionsFor(owner);
+      if ((e.key === 'f' || e.key === 'F') && fave) toggleFavorite(fave, { fromShortcut: true });
+      else if ((e.key === 'Delete' || e.key === 'Backspace') && del) deleteItem(del, { fromShortcut: true });
+      else return;
+      e.preventDefault();
+    });
+  });
+})();
+</script>
+</body>
+</html>

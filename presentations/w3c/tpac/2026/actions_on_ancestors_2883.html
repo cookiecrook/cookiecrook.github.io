@@ -14,6 +14,11 @@
     --bad: #a4161a;
     --good: #1e6b30;
     --code-bg: #f3f3f3;
+    --tok-kw: #9b2393;
+    --tok-str: #c41a16;
+    --tok-type: #0b4f79;
+    --tok-fn: #326d74;
+    --tok-com: #5d6c79;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -25,6 +30,11 @@
       --bad: #ff8a8a;
       --good: #7fd88f;
       --code-bg: #232323;
+      --tok-kw: #fc5fa3;
+      --tok-str: #fc6a5d;
+      --tok-type: #5dd8ff;
+      --tok-fn: #67b7a4;
+      --tok-com: #8a97a3;
     }
   }
   * { box-sizing: border-box; }
@@ -32,7 +42,7 @@
   body {
     background: var(--bg);
     color: var(--fg);
-    font: 400 clamp(16px, 2.3vmin + 0.5vw, 34px)/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font: 400 clamp(22px, 3.2vmin + 0.7vw, 48px)/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   }
   a { color: var(--accent); }
   a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
@@ -72,7 +82,9 @@
   .subtitle { color: var(--muted); font-size: 1.1em; }
   .meta { color: var(--muted); }
   .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2em; align-items: start; }
-  .code-pair pre { font-size: 0.62em; }
+  /* Side-by-side code shrinks with the window so the longest line still fits its column. */
+  .cols pre { font-size: min(0.72em, 1.55vw); }
+  .code-pair pre { font-size: min(0.62em, 1.2vw); }
   @media (max-aspect-ratio: 1/1) { .cols { grid-template-columns: 1fr; } }
 
   pre {
@@ -85,6 +97,11 @@
     overflow-x: auto;
   }
   code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .tok-kw, .tok-tag { color: var(--tok-kw); }
+  .tok-str { color: var(--tok-str); }
+  .tok-type, .tok-attr { color: var(--tok-type); }
+  .tok-fn { color: var(--tok-fn); }
+  .tok-com { color: var(--tok-com); font-style: italic; }
   mark { background: var(--accent-bg); color: inherit; font-weight: 600; padding: 0 0.1em; }
 
   .bad { color: var(--bad); font-weight: 600; }
@@ -116,7 +133,7 @@
     justify-content: flex-end;
     gap: 0.4em;
     padding: 0.5em 1em;
-    font-size: 0.6em;
+    font-size: 0.43em;
     color: var(--muted);
   }
   nav.controls button {
@@ -164,23 +181,23 @@
     <div class="cols">
       <div>
         <p><span class="good">Works:</span> on the link</p>
-<pre aria-label="Code example: actions on the link"><code>&lt;li&gt;
-  &lt;a href="…"
-    <mark>aria-actions="fave-1 del-1"</mark>&gt;ARIA&lt;/a&gt;
-  &lt;button id="fave-1"&gt;Favorite&lt;/button&gt;
-  &lt;button id="del-1"&gt;Delete&lt;/button&gt;
-&lt;/li&gt;</code></pre>
+<pre aria-label="Code example: actions on the link"><code>&lt;<span class="tok-tag">li</span>&gt;
+  &lt;<span class="tok-tag">a</span> <span class="tok-attr">href</span>=<span class="tok-str">"…"</span>
+    <mark><span class="tok-attr">aria-actions</span>=<span class="tok-str">"fave-1 del-1"</span></mark>&gt;ARIA&lt;/<span class="tok-tag">a</span>&gt;
+  &lt;<span class="tok-tag">button</span> <span class="tok-attr">id</span>=<span class="tok-str">"fave-1"</span>&gt;Favorite&lt;/<span class="tok-tag">button</span>&gt;
+  &lt;<span class="tok-tag">button</span> <span class="tok-attr">id</span>=<span class="tok-str">"del-1"</span>&gt;Delete&lt;/<span class="tok-tag">button</span>&gt;
+&lt;/<span class="tok-tag">li</span>&gt;</code></pre>
       </div>
       <div>
         <p><span class="bad">Doesn't work:</span> on the row</p>
-<pre aria-label="Code example: actions on the table row"><code>&lt;tr <mark>aria-actions="fave-1 del-1"</mark>&gt;
-  &lt;th&gt;&lt;a href="…"&gt;ARIA&lt;/a&gt;&lt;/th&gt;
-  &lt;td&gt;1.2&lt;/td&gt; …
-  &lt;td&gt;
-    &lt;button id="fave-1"&gt;Favorite&lt;/button&gt;
-    &lt;button id="del-1"&gt;Delete&lt;/button&gt;
-  &lt;/td&gt;
-&lt;/tr&gt;</code></pre>
+<pre aria-label="Code example: actions on the table row"><code>&lt;<span class="tok-tag">tr</span> <mark><span class="tok-attr">aria-actions</span>=<span class="tok-str">"fave-1 del-1"</span></mark>&gt;
+  &lt;<span class="tok-tag">th</span>&gt;&lt;<span class="tok-tag">a</span> <span class="tok-attr">href</span>=<span class="tok-str">"…"</span>&gt;ARIA&lt;/<span class="tok-tag">a</span>&gt;&lt;/<span class="tok-tag">th</span>&gt;
+  &lt;<span class="tok-tag">td</span>&gt;1.2&lt;/<span class="tok-tag">td</span>&gt; …
+  &lt;<span class="tok-tag">td</span>&gt;
+    &lt;<span class="tok-tag">button</span> <span class="tok-attr">id</span>=<span class="tok-str">"fave-1"</span>&gt;Favorite&lt;/<span class="tok-tag">button</span>&gt;
+    &lt;<span class="tok-tag">button</span> <span class="tok-attr">id</span>=<span class="tok-str">"del-1"</span>&gt;Delete&lt;/<span class="tok-tag">button</span>&gt;
+  &lt;/<span class="tok-tag">td</span>&gt;
+&lt;/<span class="tok-tag">tr</span>&gt;</code></pre>
       </div>
     </div>
     <!--
@@ -201,30 +218,30 @@
 <div class="cols code-pair">
       <div>
         <p><strong>UIKit</strong></p>
-<pre aria-label="UIKit code example"><code>myView.isAccessibilityElement = true
+<pre aria-label="UIKit code example"><code>myView.isAccessibilityElement = <span class="tok-kw">true</span>
 
 myView.accessibilityCustomActions = [
-  UIAccessibilityCustomAction(name: "Favorite") { _ in
-    <mark>viewModel.favoriteItem()</mark>
-    return true
+  <span class="tok-type">UIAccessibilityCustomAction</span>(name: <span class="tok-str">"Favorite"</span>) { <span class="tok-kw">_</span> <span class="tok-kw">in</span>
+    <mark>viewModel.<span class="tok-fn">favoriteItem</span>()</mark>
+    <span class="tok-kw">return</span> <span class="tok-kw">true</span>
   },
-  UIAccessibilityCustomAction(name: "Delete") { _ in
-    <mark>viewModel.deleteItem()</mark>
-    return true
+  <span class="tok-type">UIAccessibilityCustomAction</span>(name: <span class="tok-str">"Delete"</span>) { <span class="tok-kw">_</span> <span class="tok-kw">in</span>
+    <mark>viewModel.<span class="tok-fn">deleteItem</span>()</mark>
+    <span class="tok-kw">return</span> <span class="tok-kw">true</span>
   }
 ]</code></pre>
       </div>
       <div>
         <p><strong>SwiftUI</strong></p>
-<pre aria-label="SwiftUI code example"><code>HStack {
-  // item content
+<pre aria-label="SwiftUI code example"><code><span class="tok-type">HStack</span> {
+  <span class="tok-com">// item content</span>
 }
-.accessibilityElement()
-.accessibilityAction(named: Text("Favorite")) {
-  <mark>viewModel.favoriteItem()</mark>
+.<span class="tok-fn">accessibilityElement</span>()
+.<span class="tok-fn">accessibilityAction</span>(named: <span class="tok-type">Text</span>(<span class="tok-str">"Favorite"</span>)) {
+  <mark>viewModel.<span class="tok-fn">favoriteItem</span>()</mark>
 }
-.accessibilityAction(named: Text("Delete")) {
-  <mark>viewModel.deleteItem()</mark>
+.<span class="tok-fn">accessibilityAction</span>(named: <span class="tok-type">Text</span>(<span class="tok-str">"Delete"</span>)) {
+  <mark>viewModel.<span class="tok-fn">deleteItem</span>()</mark>
 }</code></pre>
       </div>
     </div>
